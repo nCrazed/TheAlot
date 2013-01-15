@@ -1,0 +1,9 @@
+{
+    "server"    : "",
+    "port"      : 6667,
+    "channel"      : "",
+    "nickname"   : "",
+    "plugins"   : [
+        "quote"
+    ]
+}
