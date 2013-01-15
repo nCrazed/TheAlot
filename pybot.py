@@ -1,6 +1,3 @@
-#! /usr/bin/env python
-#
-
 import importlib
 import json
 import irc.bot
@@ -59,7 +56,8 @@ class PyBot(irc.bot.SingleServerIRCBot):
 
     def on_pubmsg(self, c, e):
         response = self.parse_user_command(e.arguments[0])
-        c.privmsg(self.channel, response)
+        if (response):
+            c.privmsg(self.channel, response)
 
 
     def do_command(self, e, cmd):
