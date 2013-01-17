@@ -13,47 +13,61 @@ class QuotePlugin(PyBotPlugin):
 
     def parse_user_command(self, bot, command, arguments=None):
         if command == "quoteadd":
-            if arguments and self.save_quote(arguments):
-                return "Quote saved"
+            if arguments:
+                response = self.save_quote(arguments)
+                if response:
+                    return "Quote saved as {}".format(response)
+            return "You suck"
+
+        elif command == "quotedel":
+            if arguments and self.delete_quote(arguments):
+                return "Quote deleted"
             else:
-                return "You suck"
+                return "wat is delete"
         elif command == "quote":
             if arguments:
-                return self.get_quote_with(arguments)
+                return self.get_quote(arguments)
             else:
                 return self.get_quote()
 
         return None
 
-    def get_quote_with(self, search):
+    def delete_quote(self, id):
         c = self.db.cursor()
-        sql = "SELECT quote FROM quotes WHERE quote LIKE ?001 ORDER BY RANDOM() LIMIT 1"
-        c.execute(sql, ("%"+search+"%",))
-        quote = c.fetchone()
-        if quote:
-            return quote[0]
+        sql = "DELETE FROM quotes WHERE id = ?"
+        c.execute(sql, (id,))
+        if c.rowcount:
+            self.db.commit()
+            deleted = True
         else:
-            return "wat is quote"
+            deleted = False
+            self.db.rollback()
+        c.close()
+        return deleted
 
-    def get_quote(self):
+    def get_quote(self, search=""):
         c = self.db.cursor()
-        sql = "SELECT quote FROM quotes ORDER BY RANDOM() LIMIT 1"
-        c.execute(sql)
+        print(search)
+        if search:
+            sql = "SELECT * FROM quotes WHERE quote LIKE ?001 ORDER BY RANDOM() LIMIT 1"
+            c.execute(sql, ("%"+search+"%",))
+        else:
+            sql = "SELECT * FROM quotes ORDER BY RANDOM() LIMIT 1"
+            c.execute(sql)
         quote = c.fetchone()
         if quote:
-            return quote[0]
+            return "{}| {}".format(quote[0], quote[1])
         else:
             return "wat is quote"
 
     def save_quote(self, quote):
         c = self.db.cursor()
         sql = "INSERT INTO quotes(quote) VALUES(?)"
-        print(quote)
         c.execute(sql, (quote,))
         self.db.commit()
         if c.lastrowid:
             c.close()
-            return True
+            return c.lastrowid
         c.close()
 
         return False
