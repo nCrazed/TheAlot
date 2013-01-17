@@ -63,6 +63,7 @@ class PyBot(irc.bot.SingleServerIRCBot):
     def parse_user_command(self, msg):
         if msg[0] == COMMAND_PREFIX:
             command = msg[1:].split(" ", 1)
+            command[0] = command[0].lower()
             if command[0] == "die":
                 self.connection.quit("arggh!")
                 exit()
