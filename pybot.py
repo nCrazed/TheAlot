@@ -51,8 +51,11 @@ class PyBot(irc.bot.SingleServerIRCBot):
         c.join(self.channel)
 
     def on_privmsg(self, c, e):
+        if e.arguments[0] != self.prefix:
+            e.arguments[0] = self.prefix + e.arguments[0]
         response = self.parse_user_command(e.arguments[0])
-        # send response to user
+        if (response):
+            c.privmsg(e.source.nick, response)
 
     def on_pubmsg(self, c, e):
         response = self.parse_user_command(e.arguments[0])
