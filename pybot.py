@@ -4,8 +4,6 @@ import irc.bot
 import irc.strings
 
 
-COMMAND_PREFIX = "!"
-
 def to_camel_case(s):
     if s.__contains__("_"):
         out = ""
@@ -30,19 +28,20 @@ class PyBot(irc.bot.SingleServerIRCBot):
     def __init__(self):
         self.config = Config("config.json")
         self.plugins = {}
+        self.prefix = self.config.settings['prefix']
+        self.channel = self.config.settings['channel']
+
+        server = self.config.settings['server']
+        port = self.config.settings['port']
+        nickname = self.config.settings['nickname']
+
+        irc.bot.SingleServerIRCBot.__init__(self, [(server, port)], nickname, nickname)
+        self.connection.buffer_class.errors = 'replace' # Should prevent clients sending messages in latin-1 from craching the client
 
         for name in self.config.settings['plugins']:
             module = __import__("plugins."+name, fromlist=(name))
             print("Loading %sPlugin" % to_camel_case(name))
             self.plugins[name] = getattr(module, to_camel_case(name)+"Plugin")()
-
-        server = self.config.settings['server']
-        port = self.config.settings['port']
-        nickname = self.config.settings['nickname']
-        channel = self.config.settings['channel']
-        irc.bot.SingleServerIRCBot.__init__(self, [(server, port)], nickname, nickname)
-        self.connection.buffer_class.errors = 'replace' # Should prevent clients sending messages in latin-1 from craching the client
-        self.channel = channel
 
     def on_nicknameinuse(self, c, e):
         print("Nick in use, appending _")
@@ -61,7 +60,7 @@ class PyBot(irc.bot.SingleServerIRCBot):
             c.privmsg(self.channel, response)
 
     def parse_user_command(self, msg):
-        if msg[0] == COMMAND_PREFIX:
+        if msg[0] == self.prefix:
             command = msg[1:].split(" ", 1)
             command[0] = command[0].lower()
             if command[0] == "die":
