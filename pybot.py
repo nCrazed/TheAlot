@@ -41,6 +41,7 @@ class PyBot(irc.bot.SingleServerIRCBot):
         nickname = self.config.settings['nickname']
         channel = self.config.settings['channel']
         irc.bot.SingleServerIRCBot.__init__(self, [(server, port)], nickname, nickname)
+        self.connection.buffer_class.errors = 'replace' # Should prevent clients sending messages in latin-1 from craching the client
         self.channel = channel
 
     def on_nicknameinuse(self, c, e):
@@ -58,21 +59,6 @@ class PyBot(irc.bot.SingleServerIRCBot):
         response = self.parse_user_command(e.arguments[0])
         if (response):
             c.privmsg(self.channel, response)
-
-
-    def do_command(self, e, cmd):
-        nick = e.source.nick
-        c = self.connection
-
-    def get_quote(self, name=None):
-        if name:
-            return "randm quote with " + name
-        return "randm quote"
-
-    def add_quote(self, quote):
-        pass
-        # if quote saved return "quote saved"
-        # else return error message
 
     def parse_user_command(self, msg):
         if msg[0] == COMMAND_PREFIX:
