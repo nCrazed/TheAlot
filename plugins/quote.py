@@ -1,53 +1,66 @@
-from plugins.plugin import PyBotPlugin
-import sqlite3
+from plugins.plugin import Plugin
 
-class QuotePlugin(PyBotPlugin):
+class QuotePlugin(Plugin):
 
-    def __init__(self):
-        self.db = sqlite3.connect('quotes')
-        c = self.db.cursor()
-        sql = 'CREATE TABLE IF NOT EXISTS quotes (id INTEGER  PRIMARY KEY AUTOINCREMENT, quote STRING)'
+    def __init__(self, bot):
+        Plugin.__init__(self, bot)
+        sql = "CREATE TABLE IF NOT EXISTS quotes (id INTEGER PRIMARY KEY AUTOINCREMENT, quote TEXT)"
+        c = self.bot.db.cursor()
         c.execute(sql)
-        self.db.commit()
+        self.bot.db.commit()
         c.close()
 
-    def parse_user_command(self, bot, command, arguments=None):
-        if command == "quoteadd":
-            if arguments:
-                response = self.save_quote(arguments)
-                if response:
-                    return "Quote saved as {}".format(response)
-            return "You suck"
+    def hook(self):
+        self.bot.commands['quote'] = self.command
 
-        elif command == "quotedel":
-            if arguments and self.delete_quote(arguments):
+    def unhook(self):
+        del self.bot.commands['quote']
+
+    def command(self, source, arguments=None):
+        if arguments:
+            if arguments[:3] == "add":
+                self.print(source, self.add(arguments[3:]))
+            elif arguments[:6] == "delete":
+                self.print(source, self.delete(arguments[6:]))
+            else:
+                self.print(source, self.quote(arguments))
+        else:
+            self.print(source, self.quote())
+
+    def add(self, quote):
+        if quote:
+            c = self.bot.db.cursor()
+            sql = "INSERT INTO quotes(quote) VALUES(?)"
+            c.execute(sql, (quote,))
+            self.bot.db.commit()
+            if c.lastrowid:
+                id = c.lastrowid
+                c.close()
+                return "Quote added as {}".format(id)
+            else:
+                c.close()
+                return "Failed to add the quote"
+        else:
+            return "Nothing to add"
+
+    def delete(self, id):
+        if id:
+            c = self.bot.db.cursor()
+            sql = "DELETE FROM quotes WHERE id = ?"
+            c.execute(sql, (id,))
+            if c.rowcount:
+                self.bot.db.commit()
+                c.close()
                 return "Quote deleted"
             else:
-                return "wat is delete"
-        elif command == "quote":
-            if arguments:
-                return self.get_quote(arguments)
-            else:
-                return self.get_quote()
-
-        return None
-
-    def delete_quote(self, id):
-        c = self.db.cursor()
-        sql = "DELETE FROM quotes WHERE id = ?"
-        c.execute(sql, (id,))
-        if c.rowcount:
-            self.db.commit()
-            deleted = True
+                c.rollback()
+                c.close()
+                return "Failed to delete"
         else:
-            deleted = False
-            self.db.rollback()
-        c.close()
-        return deleted
+            return "Specify quote ID to delete"
 
-    def get_quote(self, search=""):
-        c = self.db.cursor()
-        print(search)
+    def quote(self, search=""):
+        c = self.bot.db.cursor()
         if search:
             sql = "SELECT * FROM quotes WHERE quote LIKE ?001 ORDER BY RANDOM() LIMIT 1"
             c.execute(sql, ("%"+search+"%",))
@@ -58,16 +71,4 @@ class QuotePlugin(PyBotPlugin):
         if quote:
             return "{}| {}".format(quote[0], quote[1])
         else:
-            return "wat is quote"
-
-    def save_quote(self, quote):
-        c = self.db.cursor()
-        sql = "INSERT INTO quotes(quote) VALUES(?)"
-        c.execute(sql, (quote,))
-        self.db.commit()
-        if c.lastrowid:
-            c.close()
-            return c.lastrowid
-        c.close()
-
-        return False
+            return "Quote not found"

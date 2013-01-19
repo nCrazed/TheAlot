@@ -3,7 +3,8 @@
     "port"      : 6667,
     "channel"   : "",
     "nickname"  : "TheAlot",
-    "prefix"    : "!"
+    "prefix"    : "!",
+    "database"  : "alot.db",
     "plugins"   : [
         "quote"
     ]

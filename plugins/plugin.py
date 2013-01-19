@@ -1,7 +1,11 @@
-class PyBotPlugin:
+class Plugin:
 
-    def __init__():
-        print("plugin")
+    def __init__(self, bot):
+        self.bot = bot
+        self.hook()
 
-    def parse_user_command(self, bot, command, arguments=None):
-        return None
+    def __del__(self):
+        self.unhook()
+
+    def print(self, target, message):
+        self.bot.connection.privmsg(target, message)
