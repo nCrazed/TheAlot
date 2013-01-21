@@ -2,6 +2,13 @@ from plugins.plugin import Plugin
 
 class QuotePlugin(Plugin):
 
+    help = {
+            "quote" : "random quote",
+            "quote <text>" : "random quote containing <text>",
+            "quote add <text>" : "quote add <text> to quotes",
+            "quote delete <number>" : "delete quote with id <number>"
+            }
+
     def __init__(self, bot):
         Plugin.__init__(self, bot)
         sql = "CREATE TABLE IF NOT EXISTS quotes (id INTEGER PRIMARY KEY AUTOINCREMENT, quote TEXT)"
@@ -16,16 +23,19 @@ class QuotePlugin(Plugin):
     def unhook(self):
         del self.bot.commands['quote']
 
-    def command(self, source, arguments=None):
+    def command(self, source, target, arguments=None):
+        if target == self.bot.config['nickname']:
+            target = source
+
         if arguments:
             if arguments[:3] == "add":
-                self.print(source, self.add(arguments[3:]))
+                self.notice(source, self.add(arguments[3:]))
             elif arguments[:6] == "delete":
-                self.print(source, self.delete(arguments[6:]))
+                self.notice(source, self.delete(arguments[6:]))
             else:
-                self.print(source, self.quote(arguments))
+                self.message(target, self.quote(arguments))
         else:
-            self.print(source, self.quote())
+            self.message(target, self.quote())
 
     def add(self, quote):
         if quote:
@@ -53,7 +63,7 @@ class QuotePlugin(Plugin):
                 c.close()
                 return "Quote deleted"
             else:
-                c.rollback()
+                self.bot.db.rollback()
                 c.close()
                 return "Failed to delete"
         else:

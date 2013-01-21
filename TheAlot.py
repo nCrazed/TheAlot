@@ -34,6 +34,10 @@ class TheAlot(irc.bot.SingleServerIRCBot):
 
         self.initCommands()
         self.plugins = {}
+        self.help = {
+                "list" : "Display list of commands"
+                }
+
         for plugin in self.config['plugins']:
             module = __import__("plugins."+plugin, fromlist=(plugin))
             name = to_camel_case(plugin) + "Plugin"
@@ -48,10 +52,24 @@ class TheAlot(irc.bot.SingleServerIRCBot):
 
     def initCommands(self):
         self.commands = {
-                'save' : self.save
+                'help' : self.showHelp,
+                'list' : self.listCommands,
                 }
 
-    def save(self, source=None, args=None):
+    def showHelp(self, source=None, target=None, cmd=None):
+        if not cmd:
+            self.connection.notice(source, "Usage: help <command>")
+        elif cmd in self.help:
+            for subcmd in self.help[cmd]:
+                self.connection.notice(source, "{:<30} {}".format(subcmd, self.help[cmd][subcmd]))
+        else:
+            self.connection.notice(source, "No help for that command")
+
+    def listCommands(self, source=None, target=None, args=None):
+        for cmd in self.commands:
+            self.connection.notice(source, cmd)
+
+    def saveConfig(self, source=None, args=None):
         print(self.config)
         fh = open(self.configFile, "w")
         fh.write(json.dumps(self.config, indent=" "*4))
@@ -69,20 +87,20 @@ class TheAlot(irc.bot.SingleServerIRCBot):
         msg = e.arguments[0]
         if msg[0] != self.config['prefix']:
             msg = self.config['prefix'] + msg
-        self.parse_user_command(e.source.nick, msg)
+        self.parse_user_command(e.source, e.target, msg)
 
     def on_pubmsg(self, c, e):
-        self.parse_user_command(self.config['channel'], e.arguments[0])
+        self.parse_user_command(e.source, e.target, e.arguments[0])
 
-    def parse_user_command(self, source, msg):
+    def parse_user_command(self, source, target, msg):
         if msg[0] == self.config['prefix']:
             command = msg[1:].split(" ", 1)
             command[0] = command[0].lower()
             if command[0] in self.commands:
                 if len(command) == 2:
-                    self.commands[command[0]](source, command[1])
+                    self.commands[command[0]](source, target, command[1])
                 else:
-                    self.commands[command[0]](source)
+                    self.commands[command[0]](source, target)
             else:
                self.connection.privmsg(source, "Invalid Command")
 
