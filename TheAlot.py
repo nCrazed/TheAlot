@@ -62,7 +62,7 @@ class TheAlot(irc.bot.SingleServerIRCBot):
 
     def loadPlugin(self, source=None, target=None, plugin=None):
         if plugin in self.plugins:
-            return
+            self.unloadPlugin(plugin=plugin)
         module = __import__("plugins."+plugin, fromlist=(plugin))
         module = reload(module)
         name = to_camel_case(plugin) + "Plugin"
@@ -79,6 +79,7 @@ class TheAlot(irc.bot.SingleServerIRCBot):
             self.connection.notice(source, "Usage: help <command>")
         elif cmd in self.help:
             for subcmd in self.help[cmd]:
+                # dynamically adjust for the longest key in help
                 self.connection.notice(source, "{:<30} {}".format(subcmd, self.help[cmd][subcmd]))
         else:
             self.connection.notice(source, "No help for that command")
