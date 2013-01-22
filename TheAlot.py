@@ -3,6 +3,7 @@ import importlib
 import json
 import irc.bot
 import irc.strings
+from imp import reload
 
 def to_camel_case(s):
     if s.__contains__("_"):
@@ -25,12 +26,12 @@ class TheAlot(irc.bot.SingleServerIRCBot):
 
         self.db = sqlite3.connect(self.config['database'])
 
-        irc.bot.SingleServerIRCBot.__init__(self, [
-            (self.config['server'], self.config['port'])],
+        irc.bot.SingleServerIRCBot.__init__(self, 
+            [(self.config['server'], self.config['port'])],
             self.config['nickname'],
             self.config['nickname']
         )
-        self.connection.buffer_class.errors = 'replace' # Stop clients with latin-1 from craching the bot
+        self.connection.buffer_class.errors = 'replace' # Stop clients with latin-1 from crashing the bot
 
         self.initCommands()
         self.plugins = {}
@@ -38,11 +39,11 @@ class TheAlot(irc.bot.SingleServerIRCBot):
                 "list" : "Display list of commands"
                 }
 
-        for plugin in self.config['plugins']:
-            module = __import__("plugins."+plugin, fromlist=(plugin))
-            name = to_camel_case(plugin) + "Plugin"
-            print("Loading {}".format(name))
-            self.plugins[plugin] = getattr(module, name)(self)
+        if "plugins" in self.config:
+            for plugin in self.config['plugins']:
+                self.loadPlugin(plugin=plugin)
+        else:
+            self.config['plugins'] = {}
 
     def __del__(self):
         try:
@@ -54,7 +55,21 @@ class TheAlot(irc.bot.SingleServerIRCBot):
         self.commands = {
                 'help' : self.showHelp,
                 'list' : self.listCommands,
+                'load' : self.loadPlugin,
+                'unload' : self.unloadPlugin,
                 }
+
+    def loadPlugin(self, source=None, target=None, plugin=None):
+        module = __import__("plugins."+plugin, fromlist=(plugin))
+        module = reload(module)
+        name = to_camel_case(plugin) + "Plugin"
+        print("Loading {}".format(name))
+        self.plugins[plugin] = getattr(module, name)(self)
+
+    def unloadPlugin(self, source=None, target=None, plugin=None):
+        if plugin in self.plugins:
+            self.plugins[plugin].__del__()
+            del self.plugins[plugin]
 
     def showHelp(self, source=None, target=None, cmd=None):
         if not cmd:

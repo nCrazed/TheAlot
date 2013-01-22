@@ -21,7 +21,10 @@ class QuotePlugin(Plugin):
         self.bot.commands['quote'] = self.command
 
     def unhook(self):
-        del self.bot.commands['quote']
+        if 'quote' in self.bot.help:
+            del self.bot.help['quote']
+        if 'quote' in self.bot.commands:
+            del self.bot.commands['quote']
 
     def command(self, source, target, arguments=None):
         if target == self.bot.config['nickname']:
