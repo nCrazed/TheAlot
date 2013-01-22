@@ -6,6 +6,5 @@
     "prefix"    : "!",
     "database"  : "alot.db",
     "plugins"   : [
-        "quote"
     ]
 }
