@@ -4,6 +4,7 @@ import json
 import irc.bot
 import irc.strings
 from imp import reload
+import sys
 
 def to_camel_case(s):
     if s.__contains__("_"):
@@ -60,6 +61,8 @@ class TheAlot(irc.bot.SingleServerIRCBot):
                 }
 
     def loadPlugin(self, source=None, target=None, plugin=None):
+        if plugin in self.plugins:
+            return
         module = __import__("plugins."+plugin, fromlist=(plugin))
         module = reload(module)
         name = to_camel_case(plugin) + "Plugin"
