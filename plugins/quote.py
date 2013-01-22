@@ -9,15 +9,12 @@ class QuotePlugin(Plugin):
             "quote delete <number>" : "delete quote with id <number>"
             }
 
-    def __init__(self, bot):
-        Plugin.__init__(self, bot)
+    def hook(self):
         sql = "CREATE TABLE IF NOT EXISTS quotes (id INTEGER PRIMARY KEY AUTOINCREMENT, quote TEXT)"
         c = self.bot.db.cursor()
         c.execute(sql)
         self.bot.db.commit()
         c.close()
-
-    def hook(self):
         self.bot.commands['quote'] = self.command
 
     def unhook(self):
