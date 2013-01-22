@@ -36,6 +36,9 @@ class TheAlot(irc.bot.SingleServerIRCBot):
 
         self.initCommands()
         self.plugins = {}
+        self.hooks = {
+                "pubmsg" : [],
+                }
         self.help = {
                 "list" : "Display list of commands"
                 }
@@ -51,6 +54,13 @@ class TheAlot(irc.bot.SingleServerIRCBot):
             self.db.close()
         except:
             pass
+
+    def hookEvent(self, eventType, method):
+        self.hooks[eventType].append(method)
+
+    def unhookEvent(self, eventType, method):
+        if method in self.hooks[eventType]:
+            self.hooks[eventType].remove(method)
 
     def initCommands(self):
         self.commands = {
@@ -109,6 +119,8 @@ class TheAlot(irc.bot.SingleServerIRCBot):
         self.parse_user_command(e.source, e.target, msg)
 
     def on_pubmsg(self, c, e):
+        for hook in self.hooks['pubmsg']:
+            hook(e.source, e.target, e.arguments[0])
         self.parse_user_command(e.source, e.target, e.arguments[0])
 
     def parse_user_command(self, source, target, msg):
