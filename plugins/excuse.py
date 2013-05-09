@@ -2,6 +2,9 @@ from plugins.plugin import Plugin
 
 import random
 
+"""
+Inspired by http://www.mandatory.com/2013/05/06/the-ultimate-excuse-creator/
+"""
 class ExcusePlugin(Plugin):
 
     help = {
