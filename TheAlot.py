@@ -38,6 +38,7 @@ class TheAlot(irc.bot.SingleServerIRCBot):
         self.plugins = {}
         self.hooks = {
                 "pubmsg" : [],
+                "welcome" : []
                 }
         self.help = {
                 "list" : "Display list of commands"
@@ -109,7 +110,12 @@ class TheAlot(irc.bot.SingleServerIRCBot):
         print("Nick in use, appending _")
         c.nick(c.get_nickname() + "_")
 
+    def callbacks(self, hook, source, target, args):
+        for callback in self.hooks[hook]:
+            callback(source, target, args)
+
     def on_welcome(self, c, e):
+        self.callbacks('welcome', e.source, e.target, e.arguments[0])
         c.join(self.config['channel'])
 
     def on_privmsg(self, c, e):
@@ -119,8 +125,7 @@ class TheAlot(irc.bot.SingleServerIRCBot):
         self.parse_user_command(e.source, e.target, msg)
 
     def on_pubmsg(self, c, e):
-        for hook in self.hooks['pubmsg']:
-            hook(e.source, e.target, e.arguments[0])
+        self.callbacks('pubmsg', e.source, e.target, e.arguments[0])
         self.parse_user_command(e.source, e.target, e.arguments[0])
 
     def parse_user_command(self, source, target, msg):
