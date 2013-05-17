@@ -106,8 +106,8 @@ class ExcusePlugin(Plugin):
     def excuse(self, source, target, arguments=None):
         if target == self.bot.config['nickname']:
             target = source
-        excuse = self.random_element(self.LEADINS) + '... '
-        excuse += self.random_element(self.PERPETRATORS) + '... '
+        excuse = self.random_element(self.LEADINS)
+        excuse += self.random_element(self.PERPETRATORS)
         excuse += self.random_element(self.FACTORS) + '.'
 
         self.message(target, excuse)
