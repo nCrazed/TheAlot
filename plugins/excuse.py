@@ -23,7 +23,7 @@ class ExcusePlugin(Plugin):
             'So I was minding my own business and boom!',
             'The most unbelievable thing just happened',
             'I couldn\'t be more apologetic, but',
-            'Sorry I\m late',
+            'Sorry I\'m late',
             'I couldn\'t go because',
             'I couldn\'t help it',
             'This is a terrible excuse, but',
