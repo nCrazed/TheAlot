@@ -21,6 +21,12 @@ def to_camel_case(s):
     else:
         return s.title()
 
+def print_stack():
+    """Print the stack trace of the currently handled exception to the standard output."""
+    import traceback
+    e = sys.exc_info()
+    traceback.print_tb(e[2])
+
 class TheAlot(irc.bot.SingleServerIRCBot):
 
     def __init__(self, config='config.json'):
@@ -118,11 +124,15 @@ class TheAlot(irc.bot.SingleServerIRCBot):
         """
         if plugin in self.plugins:
             self.unloadPlugin(plugin=plugin)
-        module = __import__("plugins."+plugin, fromlist=(plugin))
-        module = reload(module)
-        name = to_camel_case(plugin) + "Plugin"
-        print("Loading {}".format(name))
-        self.plugins[plugin] = getattr(module, name)(self)
+
+        try:
+            module = __import__("plugins."+plugin, fromlist=(plugin))
+            module = reload(module)
+            name = to_camel_case(plugin) + "Plugin"
+            print("Loading {}".format(name))
+            self.plugins[plugin] = getattr(module, name)(self)
+        except:
+            print_stack()
 
     def unloadPlugin(self, source=None, target=None, plugin=None):
         """Attempt to silently unload a plugin.
@@ -186,7 +196,10 @@ class TheAlot(irc.bot.SingleServerIRCBot):
 
         """
         for callback in self.hooks[eventType]:
-            callback(source, target, args)
+            try:
+                callback(source, target, args)
+            except:
+                print_stack()
 
     def on_welcome(self, c, e):
         """Override the method to call the \"welcome\" hooks.
@@ -204,6 +217,7 @@ class TheAlot(irc.bot.SingleServerIRCBot):
         msg = e.arguments[0]
         if msg[0] != self.config['prefix']:
             msg = self.config['prefix'] + msg
+        self.callbacks('pubmsg', e.source, e.target, msg)
         self.parse_user_command(e.source, e.target, msg)
 
     def on_pubmsg(self, c, e):
@@ -217,10 +231,13 @@ class TheAlot(irc.bot.SingleServerIRCBot):
             command = msg[1:].split(" ", 1)
             command[0] = command[0].lower()
             if command[0] in self.commands:
-                if len(command) == 2:
-                    self.commands[command[0]](source, target, command[1])
-                else:
-                    self.commands[command[0]](source, target)
+                try:
+                    if len(command) == 2:
+                        self.commands[command[0]](source, target, command[1])
+                    else:
+                        self.commands[command[0]](source, target)
+                except:
+                    print_stack()
             else:
                self.connection.privmsg(source, "Invalid Command")
 
