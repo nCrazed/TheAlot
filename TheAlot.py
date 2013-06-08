@@ -1,3 +1,10 @@
+"""
+The Alot
+========
+
+Modular IRC bot for Python.
+
+"""
 import sqlite3
 import importlib
 import json
@@ -22,7 +29,7 @@ def to_camel_case(s):
         return s.title()
 
 class TheAlot(irc.bot.SingleServerIRCBot):
-
+    """A modular single-chanel IRC bot."""
     def __init__(self, config='config.json'):
         """Create and configure a new instance of the bot.
 
