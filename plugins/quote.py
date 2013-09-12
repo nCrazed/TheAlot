@@ -14,7 +14,6 @@ class QuotePlugin(Plugin):
         c = self.bot.db.cursor()
         c.execute(sql)
         self.bot.db.commit()
-        c.close()
         self.bot.commands['quote'] = self.command
 
     def unhook(self):
@@ -45,10 +44,8 @@ class QuotePlugin(Plugin):
             self.bot.db.commit()
             if c.lastrowid:
                 id = c.lastrowid
-                c.close()
                 return "Quote added as {}".format(id)
             else:
-                c.close()
                 return "Failed to add the quote"
         else:
             return "Nothing to add"
@@ -60,11 +57,9 @@ class QuotePlugin(Plugin):
             c.execute(sql, (id,))
             if c.rowcount:
                 self.bot.db.commit()
-                c.close()
                 return "Quote deleted"
             else:
                 self.bot.db.rollback()
-                c.close()
                 return "Failed to delete"
         else:
             return "Specify quote ID to delete"
