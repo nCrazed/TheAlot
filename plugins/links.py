@@ -50,7 +50,7 @@ class LinksPlugin(Plugin):
         if arguments:
             if arguments[:3] == "add":
                 try:
-                    key, url = arguments[3:].split(maxsplit=1)
+                    key, url = arguments[4:].split(' ', 1)
                     message = self.add(key, url)
                 except ValueError:
                     message = "Expecting two arguments"
