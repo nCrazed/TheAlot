@@ -19,7 +19,7 @@ class ExcusePlugin(Plugin):
             'You\'re never going to believe this',
             'Guess what happened?!?',
             'Holy shit! Get this',
-            'Boy o I have a story for you',
+            'Boy do I have a story for you',
             'So I was minding my own business and boom!',
             'The most unbelievable thing just happened',
             'I couldn\'t be more apologetic, but',
@@ -52,7 +52,7 @@ class ExcusePlugin(Plugin):
             'Mayor McCheese',
             'Scrooge McDuck',
             'the ghost of Margaret Thatcher',
-            'te ghost of Hitler',
+            'the ghost of Hitler',
             'Ghost Dad',
             'the entire Roman Empire',
             'Kevin Ware\'s leg bone',
@@ -63,6 +63,8 @@ class ExcusePlugin(Plugin):
             'Kevin McCallister\'s real life fake tarantula',
             'the editors at joinDota',
             'Sun_Tzu',
+            'ryze',
+            'Crytash'
             )
 
     FACTORS = (
@@ -85,7 +87,7 @@ class ExcusePlugin(Plugin):
             'texted racial slurs from my phone',
             'spin-kicked me in the collar bone',
             'tried to sell me vacuum cleaners',
-            'crapepd in my gas tank',
+            'crapped in my gas tank',
             'made me golf in shoes filled with macaroni and cheese',
             'pulled me over in a stolen cop car and demanded fellatio',
             'made me find Jesus',
@@ -106,8 +108,8 @@ class ExcusePlugin(Plugin):
     def excuse(self, source, target, arguments=None):
         if target == self.bot.config['nickname']:
             target = source
-        excuse = self.random_element(self.LEADINS)
-        excuse += self.random_element(self.PERPETRATORS)
+        excuse = self.random_element(self.LEADINS) + ' '
+        excuse += self.random_element(self.PERPETRATORS) + ' '
         excuse += self.random_element(self.FACTORS) + '.'
 
         self.message(target, excuse)
