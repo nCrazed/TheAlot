@@ -1,3 +1,10 @@
+"""
+The Alot
+========
+
+Modular IRC bot for Python.
+
+"""
 import sqlite3
 import importlib
 import json
@@ -28,7 +35,7 @@ def print_stack():
     traceback.print_tb(e[2])
 
 class TheAlot(irc.bot.SingleServerIRCBot):
-
+    """A modular single-chanel IRC bot."""
     def __init__(self, config='config.json'):
         """Create and configure a new instance of the bot.
 
