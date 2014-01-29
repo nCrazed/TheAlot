@@ -1,6 +1,6 @@
 config.json
-**/__pycache__
 *.swp
 *.db
-.pyc
+*.pyc
 dist/*
+*egg-info/
