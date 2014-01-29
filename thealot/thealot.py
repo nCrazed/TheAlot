@@ -12,6 +12,7 @@ import irc.bot
 import irc.strings
 from imp import reload
 import sys
+import thealot.plugins
 
 def to_camel_case(s):
     """Convert given underscore string into CammelCase and return it.
@@ -133,13 +134,15 @@ class TheAlot(irc.bot.SingleServerIRCBot):
             self.unloadPlugin(plugin=plugin)
 
         try:
-            module = __import__("plugins."+plugin, fromlist=(plugin))
-            module = reload(module)
+            print(plugin)
             name = to_camel_case(plugin) + "Plugin"
+            module = __import__("thealot.plugins."+plugin, fromlist=[name])
+            module = reload(module)
             print("Loading {}".format(name))
             self.plugins[plugin] = getattr(module, name)(self)
-        except:
+        except Exception as e:
             print_stack()
+            print(e)
 
     def unloadPlugin(self, source=None, target=None, plugin=None):
         """Attempt to silently unload a plugin.
