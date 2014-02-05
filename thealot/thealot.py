@@ -5,7 +5,6 @@ The Alot
 Modular IRC bot for Python.
 
 """
-import sqlite3
 import importlib
 import json
 import irc.bot
@@ -13,6 +12,8 @@ import irc.strings
 from imp import reload
 import sys
 import thealot.plugins
+from sqlalchemy import create_engine
+from sqlalchemy.orm import sessionmaker
 
 def to_camel_case(s):
     """Convert given underscore string into CammelCase and return it.
@@ -33,6 +34,7 @@ def print_stack():
     """Print the stack trace of the currently handled exception to the standard output."""
     import traceback
     e = sys.exc_info()
+    print(e)
     traceback.print_tb(e[2])
 
 class TheAlot(irc.bot.SingleServerIRCBot):
@@ -51,7 +53,9 @@ class TheAlot(irc.bot.SingleServerIRCBot):
         self.config = json.load(fh)
         fh.close()
 
-        self.db = sqlite3.connect(self.config['database'])
+        engine = create_engine(self.config['database'])
+        Session = sessionmaker(bind=engine)
+        self.db = Session()
 
         irc.bot.SingleServerIRCBot.__init__(self, 
             [(self.config['server'], self.config['port'])],
