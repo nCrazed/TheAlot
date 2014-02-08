@@ -11,9 +11,12 @@ import irc.bot
 import irc.strings
 from imp import reload
 import sys
+import os
 import thealot.plugins
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
+
+BASE_DIR = os.getcwd()
 
 def to_camel_case(s):
     """Convert given underscore string into CammelCase and return it.
@@ -46,12 +49,11 @@ class TheAlot(irc.bot.SingleServerIRCBot):
         config -- a json configuration file to use (default config.json)
 
         """
-        self.configFile = config
+        self.configFile = os.path.join(BASE_DIR, config)
 
-        print("Loading configuration from {}".format(config))
-        fh = open(config, 'r')
-        self.config = json.load(fh)
-        fh.close()
+        print("Loading configuration from {}".format(self.configFile))
+        with open(self.configFile, 'r') as fh:
+            self.config = json.load(fh)
 
         engine = create_engine(self.config['database'])
         Session = sessionmaker(bind=engine)
