@@ -4,7 +4,7 @@
     "channel"   : "",
     "nickname"  : "TheAlot",
     "prefix"    : "!",
-    "database"  : "alot.db",
+    "database"  : "sqlite:///alot.db",
     "plugins"   : [
     ]
 }

@@ -1,6 +1,6 @@
 from setuptools import setup
 setup(name='thealot',
-      version='0.1',
+      version='0.1.0',
       author='Edvin "nCrazed" Malinovskis',
       author_email='edvin.malinovskis@gmail.com',
       url='https://github.com/nCrazed/TheAlot',
@@ -8,5 +8,8 @@ setup(name='thealot',
       install_requires=[
           'irc',
           'sqlalchemy'
-          ]
+          ],
+      package_data={
+          '':['config.json'],
+          },
       )
