@@ -41,7 +41,7 @@ def print_stack():
     traceback.print_tb(e[2])
 
 class TheAlot(irc.bot.SingleServerIRCBot):
-    """A modular single-chanel IRC bot."""
+    """A modular single-channel IRC bot."""
     def __init__(self, config='config.json'):
         """Create and configure a new instance of the bot.
 
@@ -61,8 +61,8 @@ class TheAlot(irc.bot.SingleServerIRCBot):
 
         irc.bot.SingleServerIRCBot.__init__(self, 
             [(self.config['server'], self.config['port'])],
-            self.config['nickname'],
-            self.config['nickname']
+            self.config['nickname'], self.config['nickname'],
+            reconnection_interval = self.config['reconnection_interval']
         )
 
         self.connection.buffer_class.errors = 'replace' # Stop clients with latin-1 from crashing the bot
@@ -81,6 +81,25 @@ class TheAlot(irc.bot.SingleServerIRCBot):
             self.db.close()
         except:
             pass
+
+    def _on_disconnect(self, c, e):
+        print("Lost connection to the server, reconnecting in {} seconds...".format(self.reconnection_interval))
+        irc.bot.SingleServerIRCBot._on_disconnect(self, c, e)
+
+    def _connect(self):
+        """
+        Establish a connection to the server at the front of the server_list.
+        """
+        server = self.server_list[0]
+        print("Trying to connect to {}:{}...".format(server.host, server.port))
+        try:
+            self.connect(server.host, server.port, self._nickname,
+                server.password, ircname=self._realname)
+            print("Connected")
+        except irc.client.ServerConnectionError:
+            print("Connection timed out, retrying in {} seconds...".format(self.reconnection_interval))
+            self.connection.execute_delayed(self.reconnection_interval,
+                                            self._connected_checker)
 
     def hookEvent(self, eventType, method):
         """Add an event hook.
