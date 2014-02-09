@@ -83,6 +83,10 @@ class TheAlot(irc.bot.SingleServerIRCBot):
             pass
 
     def _on_disconnect(self, c, e):
+        """
+        Attempt to to reconnect to the server in case of a disconnect.
+        """
+        print(type(c), type(e))
         print("Lost connection to the server, reconnecting in {} seconds...".format(self.reconnection_interval))
         irc.bot.SingleServerIRCBot._on_disconnect(self, c, e)
 
@@ -159,7 +163,6 @@ class TheAlot(irc.bot.SingleServerIRCBot):
             self.unloadPlugin(plugin=plugin)
 
         try:
-            print(plugin)
             name = to_camel_case(plugin) + "Plugin"
             module = __import__("thealot.plugins."+plugin, fromlist=[name])
             module = reload(module)
@@ -194,22 +197,21 @@ class TheAlot(irc.bot.SingleServerIRCBot):
 
         """
         if not cmd:
-            self.connection.notice(source, "Usage: help <command>")
+            self.connection.notice(source.nick, "Usage: help <command>")
         elif cmd in self.help:
             for subcmd in self.help[cmd]:
                 # dynamically adjust for the longest key in help
-                self.connection.notice(source, "{:<30} {}".format(subcmd, self.help[cmd][subcmd]))
+                self.connection.notice(source.nick, "{:<30} {}".format(subcmd, self.help[cmd][subcmd]))
         else:
-            self.connection.notice(source, "No help for that command")
+            self.connection.notice(source.nick, "No help for that command")
 
     def listCommands(self, source=None, target=None, args=None):
         """Display a list of all currently active commands."""
         for cmd in self.commands:
-            self.connection.notice(source, cmd)
+            self.connection.notice(source.nick, cmd)
 
     def saveConfig(self, source=None, args=None):
         """Save the configuration to a file."""
-        print(self.config)
         fh = open(self.configFile, "w")
         fh.write(json.dumps(self.config, indent=" "*4))
         fh.close()
@@ -237,7 +239,7 @@ class TheAlot(irc.bot.SingleServerIRCBot):
                 print_stack()
 
     def on_welcome(self, c, e):
-        """Override the method to call the \"welcome\" hooks.
+        """Override the method to call the "welcome" hooks.
 
         Arguments:
         c --
@@ -274,7 +276,7 @@ class TheAlot(irc.bot.SingleServerIRCBot):
                 except:
                     print_stack()
             else:
-               self.connection.privmsg(source, "Invalid Command")
+               self.connection.notice(source.nick, "Invalid Command")
 
 def main():
     # TODO allow passing config path as argument
