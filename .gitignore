@@ -2,4 +2,5 @@
 *.db
 *.pyc
 dist/*
+build/*
 *egg-info/
