@@ -16,13 +16,14 @@ Configure
 .. code:: json
 
     {
-        "server"    : "irc.quakenet.org",
-        "port"      : 6667,
-        "channel"   : "#TheAlot",
-        "nickname"  : "TestAlot",
-        "prefix"    : "!",
-        "database"  : "sqlite:///alot.db",
-        "plugins"   : [
+        "server"                : "irc.quakenet.org",
+        "port"                  : 6667,
+        "channel"               : "#TheAlot",
+        "nickname"              : "TestAlot",
+        "prefix"                : "!",
+        "database"              : "sqlite:///alot.db",
+        "reconnection_interval" : 10,
+        "plugins"               : [
         ]
     }
 

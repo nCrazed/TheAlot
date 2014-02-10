@@ -52,6 +52,9 @@ Configuration
     ### database
     > Database URL string acceptable by [sqlalchemy.create_engine()](http://docs.sqlalchemy.org/en/rel_0_9/core/engines.html#sqlalchemy.create_engine) to be used by the bot and plugins.
 
+    ### reconnection_interval
+    Amount of seconds to wait before attempting to reconnect after a timeout or a lost connetion
+
     ### plugins
     > a comma separated list of plugin module names to be loaded when bot is started.
     > Example: To run the [AlotPlugin](https://github.com/nCrazed/AlotPlugin) install `thealot-alot` package with:
@@ -86,3 +89,10 @@ Configuration
         bot = TheAlot()
         bor.start()
     ```
+
+## Available plugins
+
+* [thealot-alot](https://pypi.python.org/pypi/thealot-alot)
+* [thealot-excuse](https://pypi.python.org/pypi/thealot-excuse)
+* [thealot-links](https://pypi.python.org/pypi/thealot-links)
+* [thealot-quote](https://pypi.python.org/pypi/thealot-quote)
