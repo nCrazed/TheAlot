@@ -1,6 +1,6 @@
 from setuptools import setup
 setup(name='thealot',
-      version='0.3.1.dev',
+      version='0.3.2.dev',
       author='Edvin "nCrazed" Malinovskis',
       author_email='edvin.malinovskis@gmail.com',
       url='https://github.com/nCrazed/TheAlot',

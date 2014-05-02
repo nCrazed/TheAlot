@@ -264,7 +264,7 @@ class TheAlot(irc.bot.SingleServerIRCBot):
 
     def parse_user_command(self, source, target, msg):
         """Check if message starts with command prefix and attempt to call appropriate command."""
-        if msg[0] == self.config['prefix']:
+        if len(msg) > 1 and msg[0] == self.config['prefix']:
             command = msg[1:].split(" ", 1)
             command[0] = command[0].lower()
             if command[0] in self.commands:
